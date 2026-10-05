@@ -1,0 +1,46 @@
+MARIAGE CHLOÉ - PROCÉDURE RAPIDE
+================================
+
+1. TESTER SUR LE PC
+-------------------
+- Installer Python 3.11 ou plus récent.
+- Ouvrir PowerShell dans le dossier.
+- Exécuter :
+
+  python -m venv .venv
+  .venv\Scripts\activate
+  pip install -r requirements.txt
+  python generer_mot_de_passe.py
+
+- Copier le hash affiché puis exécuter :
+
+  $env:ADMIN_USERNAME="admin"
+  $env:ADMIN_PASSWORD_HASH="COLLER_LE_HASH"
+  $env:SECRET_KEY="mettre-ici-une-cle-longue-et-aleatoire"
+  python app.py
+
+- Formulaire : http://127.0.0.1:5000
+- Administration : http://127.0.0.1:5000/admin
+
+2. METTRE EN LIGNE SUR RENDER
+-----------------------------
+- Créer un dépôt GitHub privé.
+- Envoyer tous les fichiers du dossier dans ce dépôt.
+- Dans Render : New > Blueprint.
+- Connecter le dépôt.
+- Laisser Render lire render.yaml et créer le site plus la base.
+- Dans Environment, renseigner ADMIN_PASSWORD_HASH.
+- Vérifier APP_BASE_URL avant de générer le QR code.
+
+3. UTILISER
+-----------
+- Site invité : https://mariage-chloe.onrender.com
+- Administration : https://mariage-chloe.onrender.com/admin
+- Dans l’administration : export Excel, CSV et QR code.
+
+IMPORTANT
+---------
+- L’adresse mariage-chloe.onrender.com doit encore être disponible lors du déploiement.
+- Faire un essai complet avant d’imprimer le QR code.
+- Télécharger régulièrement l’export Excel comme sauvegarde.
+- Ne jamais communiquer le mot de passe administrateur.
