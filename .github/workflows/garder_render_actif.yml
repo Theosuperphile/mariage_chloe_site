@@ -1,0 +1,26 @@
+name: Garder le site Render actif
+
+on:
+  schedule:
+    # Appel toutes les 10 minutes
+    - cron: "3,13,23,33,43,53 * * * *"
+
+  # Permet aussi de tester manuellement
+  workflow_dispatch:
+
+jobs:
+  appel-du-site:
+    name: Appeler la page de sante
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verifier que le site repond
+        run: |
+          echo "Appel du site de mariage..."
+          curl --fail --silent --show-error \
+            --retry 2 \
+            --retry-delay 10 \
+            --max-time 90 \
+            "https://mariage-chloe-khaled.onrender.com/sante"
+          echo ""
+          echo "Le site a repondu correctement."
