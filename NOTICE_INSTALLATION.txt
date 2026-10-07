@@ -1,0 +1,61 @@
+PATCH V1.1.0 - PARTICIPANTS ET ALLERGIES INDIVIDUELLES
+
+IMPORTANT
+- Ce ZIP est un patch a appliquer sur le depot V1.0.0 existant.
+- Il ne contient pas la photographie binaire. Ne supprimez pas static/images/photo_mariage.jpg.
+- Il ne contient aucun secret.
+- La table reponses existante n'est ni renommee ni supprimee.
+- Une nouvelle table participants est creee automatiquement au premier demarrage.
+
+FICHIERS A REMPLACER
+app.py
+templates/base.html
+templates/index.html
+templates/merci.html
+templates/erreur.html
+templates/admin/connexion.html
+templates/admin/tableau.html
+static/js/app.js
+static/css/style.css
+tests/test_app.py
+requirements.txt
+
+INSTALLATION
+1. Dans Render, telechargez d'abord un export Excel de sauvegarde.
+2. Faites une copie locale complete du depot V1.0.0.
+3. Creez une branche Git : git checkout -b v1.1.0-participants
+4. Decompressez ce ZIP a la racine du depot et acceptez le remplacement des fichiers.
+5. Verifiez que static/images/photo_mariage.jpg est toujours present.
+6. Installez les dependances : python -m pip install -r requirements.txt
+7. Lancez : python -m py_compile app.py
+8. Lancez : pytest -q
+9. Lancez localement : python app.py
+10. Testez un present avec 2 adultes et 1 enfant, puis un absent.
+11. Verifiez /admin, Excel, CSV, QR code et /sante.
+12. Committez : git add . && git commit -m "V1.1.0 participants et allergies individuelles"
+13. Poussez : git push -u origin v1.1.0-participants
+14. Fusionnez dans la branche principale uniquement apres validation.
+15. Render redeploie. Au premier demarrage, db.create_all() cree seulement la nouvelle table participants.
+16. Verifiez les logs Render, puis le formulaire public et l'administration.
+
+RETOUR ARRIERE
+- Revenir au commit V1.0.0 restaure l'ancien code.
+- La table participants peut rester dans PostgreSQL sans perturber V1.0.0.
+- Ne supprimez pas cette table avant d'avoir confirme qu'aucune nouvelle reponse V1.1.0 ne doit etre conservee.
+
+CONTROLES REALISES
+- Compilation Python : OK.
+- 4 tests automatises : OK.
+- Enregistrement de 2 adultes et 1 enfant : OK.
+- Allergies individuelles : OK.
+- Validation d'un nom manquant : OK.
+- Export Excel et CSV : OK.
+- Suppression en cascade des participants : OK.
+- Route /sante : OK.
+
+CONTROLES A FAIRE SUR VOTRE INFRASTRUCTURE
+- PostgreSQL Render reel.
+- Deploiement Gunicorn sur Render.
+- Presence de la photographie binaire.
+- Responsive sur vos smartphones.
+- GitHub Actions planifie.

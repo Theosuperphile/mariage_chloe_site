@@ -1,37 +1,6 @@
-(() => {
-  const form = document.querySelector('#questionnaire');
-  if (!form) return;
-  const qPresence = document.querySelector('#questions-presence');
-  const blocCouchages = document.querySelector('#bloc-couchages');
-  const blocBrunch = document.querySelector('#bloc-brunch');
-  const verification = document.querySelector('#verification-repas');
-  const valeur = nom => form.querySelector(`input[name="${nom}"]:checked`)?.value;
-  const nombre = id => Number(document.querySelector(`#${id}`)?.value || 0);
-
-  function requisDans(bloc, actif) {
-    bloc.querySelectorAll('input[type="radio"]').forEach(el => el.required = actif);
-  }
-  function actualiser() {
-    const present = valeur('presence') === 'oui';
-    qPresence.hidden = !present;
-    requisDans(qPresence, present);
-    const hebergement = present && valeur('hebergement') === 'oui';
-    blocCouchages.hidden = !hebergement;
-    document.querySelector('#couchages').required = hebergement;
-    const brunch = present && valeur('brunch') === 'oui';
-    blocBrunch.hidden = !brunch;
-    ['brunch_adultes', 'brunch_enfants'].forEach(id => document.querySelector(`#${id}`).required = brunch);
-    if (present) {
-      const adultes = nombre('adultes');
-      const repas = nombre('repas_classiques') + nombre('repas_vegetariens');
-      const enfants = nombre('enfants');
-      const menus = nombre('menus_enfants');
-      const ok = adultes === repas && enfants === menus;
-      verification.textContent = ok ? '✓ Les quantités de repas sont cohérentes.' : `À vérifier : ${adultes} adulte(s) pour ${repas} repas adulte(s), ${enfants} enfant(s) pour ${menus} menu(s) enfant.`;
-      verification.className = `verification ${ok ? 'ok' : 'attention'}`;
-    }
-  }
-  form.addEventListener('input', actualiser);
-  form.addEventListener('change', actualiser);
-  actualiser();
-})();
+(()=>{const f=document.querySelector('#questionnaire');if(!f)return;const q=document.querySelector('#questions-presence'),p=document.querySelector('#participants'),bc=document.querySelector('#bloc-couchages'),bb=document.querySelector('#bloc-brunch'),v=document.querySelector('#verification-repas');const radio=n=>f.querySelector(`input[name="${n}"]:checked`)?.value;const num=id=>Math.max(0,Math.min(20,Number(document.querySelector(`#${id}`)?.value||0)));const cache={};
+function sauver(){p.querySelectorAll('input').forEach(e=>cache[e.name]=e.value)}
+function fiche(type,i){const nom=`${type}_${i}_nom`,all=`${type}_${i}_allergies`;const principal=type==='adulte'&&i===1;return `<article class="fiche-participant"><h3>${type==='adulte'?'Adulte':'Enfant'} ${i}</h3><label>Nom et prénom <b>*</b></label><input name="${nom}" maxlength="150" required value="${principal?document.querySelector('#nom_prenom').value:(cache[nom]||'')}" ${principal?'readonly':''}><label>Allergies alimentaires</label><input name="${all}" maxlength="500" value="${cache[all]||''}" placeholder="Laisser vide si aucune"></article>`}
+function participants(){sauver();let h='';for(let i=1;i<=num('adultes');i++)h+=fiche('adulte',i);for(let i=1;i<=num('enfants');i++)h+=fiche('enfant',i);p.innerHTML=h}
+function actualiser(){const present=radio('presence')==='oui';q.hidden=!present;q.querySelectorAll('input[type=radio]').forEach(e=>e.required=present);bc.hidden=!(present&&radio('hebergement')==='oui');bb.hidden=!(present&&radio('brunch')==='oui');if(present){const a=num('adultes'),e=num('enfants'),r=num('repas_classiques')+num('repas_vegetariens'),m=num('menus_enfants');const ok=a===r&&e===m;v.textContent=ok?'✓ Les quantités de repas sont cohérentes.':`À vérifier : ${a} adulte(s) pour ${r} repas, ${e} enfant(s) pour ${m} menu(s).`;v.className=`verification ${ok?'ok':'attention'}`}}
+f.addEventListener('input',e=>{if(['adultes','enfants'].includes(e.target.id))participants();if(e.target.id==='nom_prenom'){const x=f.querySelector('[name="adulte_1_nom"]');if(x)x.value=e.target.value}actualiser()});f.addEventListener('change',actualiser);participants();actualiser()})();
