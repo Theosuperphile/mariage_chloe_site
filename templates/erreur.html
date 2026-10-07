@@ -1,2 +1,1 @@
-{% extends "base.html" %}
-{% block contenu %}<main class="page centre"><section class="carte message-final"><h1>Oups</h1><p>{{ message }}</p><a class="bouton secondaire" href="{{ url_for('accueil') }}">Retour à l’accueil</a></section></main>{% endblock %}
+{% extends "base.html" %}{% block contenu %}<main class="page centre"><section class="carte message-final"><h1>Oups</h1><p>{{ message }}</p><a href="{{ url_for('accueil') }}">Retour</a></section></main>{% endblock %}

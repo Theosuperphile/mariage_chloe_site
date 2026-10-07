@@ -1,5 +1,1 @@
-{% extends "base.html" %}
-{% block titre %}Merci pour votre réponse{% endblock %}
-{% block contenu %}
-<main class="page centre"><section class="carte message-final"><div class="icone">✓</div><h1>Merci !</h1>{% if reponse %}<p>La réponse de <strong>{{ reponse.nom_prenom }}</strong> a bien été enregistrée.</p>{% else %}<p>Votre réponse a bien été enregistrée.</p>{% endif %}<p>Chloé et Khaled ont hâte de partager ce moment avec vous.</p><a class="bouton secondaire" href="{{ url_for('accueil') }}">Retour au formulaire</a></section></main>
-{% endblock %}
+{% extends "base.html" %}{% block contenu %}<main class="page centre"><section class="carte message-final"><h1>Merci !</h1><p>Votre reponse a bien ete enregistree.</p><a class="bouton secondaire" href="{{ url_for('accueil') }}">Retour au formulaire</a></section></main>{% endblock %}

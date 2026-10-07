@@ -1,97 +1,10 @@
-{% extends "base.html" %}
-{% block contenu %}
-<main class="page">
-  <section class="carte principale">
-    <div class="hero" aria-hidden="true"><span>❀</span><span>✿</span><span>❀</span></div>
-    <header class="entete">
-      <p class="sur-titre">Nous nous marions</p>
-      <h1>Chloé <span>&amp;</span> Khaled</h1>
-      <p>Samedi 24 avril 2027</p>
-      <p>15 h 30 · 220 rue du Stade · 88220 Hadol</p>
-    </header>
-
-    <form action="{{ url_for('envoyer') }}" method="post" id="questionnaire" novalidate>
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <div class="piege" aria-hidden="true"><label>Site web<input name="site_web" tabindex="-1" autocomplete="off"></label></div>
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div class="alertes" role="alert">
-            {% for categorie, message in messages %}<p class="alerte {{ categorie }}">{{ message }}</p>{% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
-
-      <fieldset>
-        <legend>Vos coordonnées</legend>
-        <label for="nom_prenom">Nom et prénom <b>*</b></label>
-        <input id="nom_prenom" name="nom_prenom" type="text" autocomplete="name" maxlength="150" required value="{{ donnees.get('nom_prenom', '') if donnees else '' }}" placeholder="Ex. Marie et Jean Martin">
-
-        <label for="telephone">Numéro de téléphone <b>*</b></label>
-        <input id="telephone" name="telephone" type="tel" inputmode="tel" autocomplete="tel" maxlength="40" required value="{{ donnees.get('telephone', '') if donnees else '' }}" placeholder="Ex. +33 6 12 34 56 78">
-      </fieldset>
-
-      <fieldset>
-        <legend>Serez-vous présent au mariage ? <b>*</b></legend>
-        <label class="choix"><input type="radio" name="presence" value="oui" required {% if donnees and donnees.get('presence') == 'oui' %}checked{% endif %}> Oui, avec plaisir !</label>
-        <label class="choix"><input type="radio" name="presence" value="non" required {% if donnees and donnees.get('presence') == 'non' %}checked{% endif %}> Non, je ne pourrai pas venir</label>
-        <p class="aide">Les questions suivantes s’adaptent automatiquement à votre réponse.</p>
-      </fieldset>
-
-      <div id="questions-presence" hidden>
-        <fieldset>
-          <legend>Nombre de personnes</legend>
-          <div class="grille-2">
-            <div><label for="adultes">Adultes</label><input id="adultes" name="adultes" type="number" min="0" max="20" value="{{ donnees.get('adultes', '1') if donnees else '1' }}"></div>
-            <div><label for="enfants">Enfants <small>(moins de 16 ans)</small></label><input id="enfants" name="enfants" type="number" min="0" max="20" value="{{ donnees.get('enfants', '0') if donnees else '0' }}"></div>
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend>Choix des repas <b>*</b></legend>
-          <p class="aide">Indiquez le nombre de chaque repas. Le total des repas adultes doit correspondre au nombre d’adultes.</p>
-          <div class="grille-3">
-            <div><label for="repas_classiques">Classiques</label><input id="repas_classiques" name="repas_classiques" type="number" min="0" max="20" value="{{ donnees.get('repas_classiques', '1') if donnees else '1' }}"></div>
-            <div><label for="repas_vegetariens">Végétariens</label><input id="repas_vegetariens" name="repas_vegetariens" type="number" min="0" max="20" value="{{ donnees.get('repas_vegetariens', '0') if donnees else '0' }}"></div>
-            <div><label for="menus_enfants">Menus enfants</label><input id="menus_enfants" name="menus_enfants" type="number" min="0" max="20" value="{{ donnees.get('menus_enfants', '0') if donnees else '0' }}"></div>
-          </div>
-          <p id="verification-repas" class="verification" aria-live="polite"></p>
-        </fieldset>
-
-        <fieldset>
-          <legend>Allergies alimentaires</legend>
-          <label for="allergies">Si concerné, précisez la personne et l’allergie</label>
-          <textarea id="allergies" name="allergies" maxlength="2000" rows="3" placeholder="Ex: allergie aux fruits à coque ...">{{ donnees.get('allergies', '') if donnees else '' }}</textarea>
-        </fieldset>
-
-        <fieldset>
-          <legend>Hébergement <b>*</b></legend>
-          <p class="aide texte-long">Le tarif est de 25 € maximum par personne. Lorsque le nombre de couchages sera connu, un devis précis sera établi. Un virement sera ensuite demandé pour confirmer la réservation. Pensez à apporter une serviette de toilette.</p>
-          <label class="choix"><input type="radio" name="hebergement" value="oui" {% if donnees and donnees.get('hebergement') == 'oui' %}checked{% endif %}> Je souhaite dormir sur place</label>
-          <label class="choix"><input type="radio" name="hebergement" value="non" {% if donnees and donnees.get('hebergement') == 'non' %}checked{% endif %}> Je dors ailleurs</label>
-          <div id="bloc-couchages" hidden><label for="couchages">Nombre de couchages souhaités <b>*</b></label><input id="couchages" name="couchages" type="number" min="0" max="40" value="{{ donnees.get('couchages', '0') if donnees else '0' }}"></div>
-        </fieldset>
-
-        <fieldset>
-          <legend>Serez-vous présent au brunch le lendemain ? <b>*</b></legend>
-          <label class="choix"><input type="radio" name="brunch" value="oui" {% if donnees and donnees.get('brunch') == 'oui' %}checked{% endif %}> Oui</label>
-          <label class="choix"><input type="radio" name="brunch" value="non" {% if donnees and donnees.get('brunch') == 'non' %}checked{% endif %}> Non</label>
-          <div id="bloc-brunch" class="grille-2" hidden>
-            <div><label for="brunch_adultes">Adultes au brunch</label><input id="brunch_adultes" name="brunch_adultes" type="number" min="0" max="20" value="{{ donnees.get('brunch_adultes', '0') if donnees else '0' }}"></div>
-            <div><label for="brunch_enfants">Enfants au brunch</label><input id="brunch_enfants" name="brunch_enfants" type="number" min="0" max="20" value="{{ donnees.get('brunch_enfants', '0') if donnees else '0' }}"></div>
-          </div>
-        </fieldset>
-      </div>
-
-      <fieldset>
-        <legend>Un message pour les mariés</legend>
-        <textarea name="message" maxlength="2000" rows="4" placeholder="Votre message, si vous le souhaitez">{{ donnees.get('message', '') if donnees else '' }}</textarea>
-      </fieldset>
-
-      <label class="consentement"><input type="checkbox" required> J’accepte que ces informations soient utilisées uniquement pour l’organisation du mariage. <b>*</b></label>
-      <button class="bouton principal-bouton" type="submit">Envoyer ma réponse</button>
-      <p class="obligatoire">* Champs obligatoires</p>
-    </form>
-  </section>
-</main>
-{% endblock %}
+{% extends "base.html" %}{% block contenu %}<main class="page"><section class="carte principale"><div class="hero"><img src="{{ url_for('static',filename='images/photo_mariage.jpg') }}" alt="Decoration florale du mariage"></div><header class="entete"><p class="sur-titre">Nous nous marions</p><h1>Chloe <span>&amp;</span> Khaled</h1><p>Samedi 24 avril 2027</p><p>15 h 30 · 220 rue du Stade · 88220 Hadol</p></header>
+<form action="{{ url_for('envoyer') }}" method="post" id="questionnaire" novalidate><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="piege"><input name="site_web" tabindex="-1"></div>{% with messages=get_flashed_messages(with_categories=true) %}{% for c,m in messages %}<p class="alerte {{ c }}">{{ m }}</p>{% endfor %}{% endwith %}
+<fieldset><legend>Vos coordonnees</legend><label>Nom et prenom <b>*</b></label><input id="nom_prenom" name="nom_prenom" maxlength="150" required value="{{ donnees.get('nom_prenom','') if donnees else '' }}"><label>Numero de telephone <b>*</b></label><input name="telephone" type="tel" maxlength="40" required value="{{ donnees.get('telephone','') if donnees else '' }}"></fieldset>
+<fieldset><legend>Serez-vous present au mariage ? <b>*</b></legend><label class="choix"><input type="radio" name="presence" value="oui" required {% if donnees and donnees.get('presence')=='oui' %}checked{% endif %}> Oui, avec plaisir !</label><label class="choix"><input type="radio" name="presence" value="non" required {% if donnees and donnees.get('presence')=='non' %}checked{% endif %}> Non, je ne pourrai pas venir</label></fieldset>
+<div id="questions-presence" hidden><fieldset><legend>Nombre de personnes</legend><div class="grille-2"><div><label>Adultes</label><input id="adultes" name="adultes" type="number" min="0" max="20" value="{{ donnees.get('adultes','1') if donnees else '1' }}"></div><div><label>Enfants</label><input id="enfants" name="enfants" type="number" min="0" max="20" value="{{ donnees.get('enfants','0') if donnees else '0' }}"></div></div></fieldset>
+<fieldset><legend>Informations sur les participants <b>*</b></legend><p class="aide">Le premier adulte reprend automatiquement le nom de la personne qui remplit le formulaire.</p><div id="participants"></div></fieldset>
+<fieldset><legend>Choix des repas <b>*</b></legend><div class="grille-3"><div><label>Classiques</label><input id="repas_classiques" name="repas_classiques" type="number" min="0" max="20" value="{{ donnees.get('repas_classiques','1') if donnees else '1' }}"></div><div><label>Vegetariens</label><input id="repas_vegetariens" name="repas_vegetariens" type="number" min="0" max="20" value="{{ donnees.get('repas_vegetariens','0') if donnees else '0' }}"></div><div><label>Menus enfants</label><input id="menus_enfants" name="menus_enfants" type="number" min="0" max="20" value="{{ donnees.get('menus_enfants','0') if donnees else '0' }}"></div></div><p id="verification-repas" class="verification"></p></fieldset>
+<fieldset><legend>Hebergement <b>*</b></legend><label class="choix"><input type="radio" name="hebergement" value="oui"> Je souhaite dormir sur place</label><label class="choix"><input type="radio" name="hebergement" value="non"> Je dors ailleurs</label><div id="bloc-couchages" hidden><label>Nombre de couchages</label><input id="couchages" name="couchages" type="number" min="0" max="40" value="0"></div></fieldset>
+<fieldset><legend>Brunch le lendemain ? <b>*</b></legend><label class="choix"><input type="radio" name="brunch" value="oui"> Oui</label><label class="choix"><input type="radio" name="brunch" value="non"> Non</label><div id="bloc-brunch" class="grille-2" hidden><div><label>Adultes au brunch</label><input id="brunch_adultes" name="brunch_adultes" type="number" value="0"></div><div><label>Enfants au brunch</label><input id="brunch_enfants" name="brunch_enfants" type="number" value="0"></div></div></fieldset></div>
+<fieldset><legend>Un message pour les maries</legend><textarea name="message" maxlength="2000"></textarea></fieldset><label class="consentement"><input name="consentement" type="checkbox" required> J'accepte l'utilisation de ces informations pour l'organisation du mariage. <b>*</b></label><button class="bouton principal-bouton">Envoyer ma reponse</button></form></section></main>{% endblock %}
